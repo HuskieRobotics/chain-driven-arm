@@ -13,7 +13,7 @@ import org.littletonrobotics.junction.Logger;
  * library aren't good examples for typical robot subsystems. This class can serve as an example or
  * be used for quick prototyping.
  */
-public class Subsystem extends SubsystemBase {
+public class ChainDrivenArm extends SubsystemBase {
 
   // these Tunables are convenient when testing as they provide direct control of the subsystem's
   // motor
