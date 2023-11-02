@@ -1,4 +1,4 @@
-package frc.robot.subsystems.subsystem;
+package frc.robot.subsystems.chainArm;
 
 import static frc.robot.subsystems.subsystem.SubsystemConstants.*;
 
@@ -21,15 +21,15 @@ public class ChainDrivenArm extends SubsystemBase {
   private final TunableNumber motorCurrent = new TunableNumber("Subsystem/current", 0.0);
   private final TunableNumber motorPosition = new TunableNumber("Subsystem/position", 0.0);
 
-  private final SubsystemIOInputsAutoLogged inputs = new SubsystemIOInputsAutoLogged();
-  private SubsystemIO io;
+  private final ChainDrivenArmIOInputsAutoLogged inputs = new ChainDrivenArmIOInputsAutoLogged();
+  private ChainDrivenArmIO io;
 
   /**
    * Create a new subsystem with its associated hardware interface object.
    *
    * @param io the hardware interface object for this subsystem
    */
-  public Subsystem(SubsystemIO io) {
+  public ChainDrivenArm(ChainDrivenArmIO io) {
 
     this.io = io;
 

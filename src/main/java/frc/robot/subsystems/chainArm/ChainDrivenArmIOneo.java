@@ -1,4 +1,4 @@
-package frc.robot.subsystems.subsystem;
+package frc.robot.subsystems.chainArm;
 
 import static frc.robot.subsystems.subsystem.SubsystemConstants.*;
 
@@ -11,6 +11,9 @@ import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.revrobotics.CANSparkMax;
+
+import edu.wpi.first.wpilibj.motorcontrol.Talon;
 import frc.lib.team3061.RobotConfig;
 import frc.lib.team3061.swerve.Conversions;
 import frc.lib.team6328.util.Alert;
@@ -18,8 +21,8 @@ import frc.lib.team6328.util.Alert.AlertType;
 import frc.lib.team6328.util.TunableNumber;
 
 /** TalonFX implementation of the generic SubsystemIO */
-public class SubsystemIOTalonFX implements SubsystemIO {
-  private TalonFX motor;
+public class ChainDrivenArmIOneo implements ChainDrivenArmIO {
+  private CANSparkMax motor;
 
   private VoltageOut voltageRequest;
   private TorqueCurrentFOC currentRequest;
@@ -35,7 +38,7 @@ public class SubsystemIOTalonFX implements SubsystemIO {
       new TunableNumber("Subsystem/kPeakOutput", POSITION_PID_PEAK_OUTPUT);
 
   /** Create a TalonFX-specific generic SubsystemIO */
-  public SubsystemIOTalonFX() {
+  public ChainDrivenArmIOneo() {
     configMotor(MOTOR_CAN_ID);
   }
 
@@ -45,16 +48,15 @@ public class SubsystemIOTalonFX implements SubsystemIO {
    * @param inputs the inputs object to update
    */
   @Override
-  public void updateInputs(SubsystemIOInputs inputs) {
-    inputs.positionDeg =
-        Conversions.falconRotationsToMechanismDegrees(
-            motor.getRotorPosition().getValue(), GEAR_RATIO);
-    inputs.velocityRPM =
-        Conversions.falconRPSToMechanismRPM(motor.getRotorVelocity().getValue(), GEAR_RATIO);
-    inputs.closedLoopError = motor.getClosedLoopError().getValue();
+  public void updateInputs(ChainDrivenArmIOInputs inputs) {
+    inputs.positionRad =
+        Conversions.neoRotationsToMechanismRadians(
+            motor.getEncoder().getPosition(), GEAR_RATIO);
+    inputs.velocityRPM = motor.getEncoder().getVelocity();
+    inputs.closedLoopError = motor.getClosedLoopError().getValue(); // FIXME what is the closed loop method for neos
     inputs.setpoint = motor.getClosedLoopReference().getValue();
-    inputs.power = motor.getDutyCycle().getValue() / 2.0;
-    inputs.controlMode = motor.getControlMode().toString();
+    inputs.power = motor.getAppliedOutput();
+    inputs.controlMode = motor.ControlType.value;
     inputs.statorCurrentAmps = motor.getStatorCurrent().getValue();
     inputs.tempCelsius = motor.getDeviceTemp().getValue();
     inputs.supplyCurrentAmps = motor.getSupplyCurrent().getValue();
@@ -79,7 +81,7 @@ public class SubsystemIOTalonFX implements SubsystemIO {
    */
   @Override
   public void setMotorPower(double power) {
-    this.motor.setControl(voltageRequest.withOutput(power * 12.0));
+    this.motor.set(power);
   }
 
   /**
@@ -89,7 +91,7 @@ public class SubsystemIOTalonFX implements SubsystemIO {
    */
   @Override
   public void setMotorCurrent(double current) {
-    this.motor.setControl(currentRequest.withOutput(current));
+    this.motor.set(currentRequest.withOutput(current));
   }
 
   /**

@@ -7,7 +7,7 @@ public interface ChainDrivenArmIO {
   /** Contains all of the input data received from hardware. */
   @AutoLog
   public static class ChainDrivenArmIOInputs {
-    double positionDeg = 0.0;
+    double positionRad = 0.0;
     double velocityRPM = 0.0;
     double closedLoopError = 0.0;
     double setpoint = 0.0;
@@ -42,7 +42,9 @@ public interface ChainDrivenArmIO {
    *
    * @param power the percentage of maximum power to set the motor to
    */
-  public default void setPower(double power) {}
+  public default void setMotorPower(double power) {}
+
+  public default void setMotorCurrent(double current) {}
 
   /**
    * Set the arm position in degrees above the horizontal
@@ -50,5 +52,5 @@ public interface ChainDrivenArmIO {
    * @param position the position to set the motor to in degrees
    * @param arbitraryFeedForward the arbitrary feed forward as a percentage of maximum power
    */
-  public default void setPositionDegrees(double position, double arbitraryFeedForward) {}
+  public default void setMotorPosition(double position, double arbitraryFeedForward) {}
 }
