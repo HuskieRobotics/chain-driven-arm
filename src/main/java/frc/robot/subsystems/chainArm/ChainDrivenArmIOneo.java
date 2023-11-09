@@ -12,8 +12,6 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.revrobotics.CANSparkMax;
-
-import edu.wpi.first.wpilibj.motorcontrol.Talon;
 import frc.lib.team3061.RobotConfig;
 import frc.lib.team3061.swerve.Conversions;
 import frc.lib.team6328.util.Alert;
@@ -23,6 +21,7 @@ import frc.lib.team6328.util.TunableNumber;
 /** TalonFX implementation of the generic SubsystemIO */
 public class ChainDrivenArmIOneo implements ChainDrivenArmIO {
   private CANSparkMax motor;
+  private CANSparkMax.ControlType controlType;
 
   private VoltageOut voltageRequest;
   private TorqueCurrentFOC currentRequest;
@@ -50,16 +49,17 @@ public class ChainDrivenArmIOneo implements ChainDrivenArmIO {
   @Override
   public void updateInputs(ChainDrivenArmIOInputs inputs) {
     inputs.positionRad =
-        Conversions.neoRotationsToMechanismRadians(
-            motor.getEncoder().getPosition(), GEAR_RATIO);
+        Conversions.neoRotationsToMechanismRadians(motor.getEncoder().getPosition(), GEAR_RATIO);
     inputs.velocityRPM = motor.getEncoder().getVelocity();
-    inputs.closedLoopError = motor.getClosedLoopError().getValue(); // FIXME what is the closed loop method for neos
+    inputs.closedLoopError =
+        motor.getEncoder(null, MOTOR_CAN_ID).getPosition()
+            - setPoint; // FIXME what is the closed loop method for neos
     inputs.setpoint = motor.getClosedLoopReference().getValue();
     inputs.power = motor.getAppliedOutput();
-    inputs.controlMode = motor.ControlType.value;
-    inputs.statorCurrentAmps = motor.getStatorCurrent().getValue();
-    inputs.tempCelsius = motor.getDeviceTemp().getValue();
-    inputs.supplyCurrentAmps = motor.getSupplyCurrent().getValue();
+    inputs.controlMode = motor.getMotorType().toString();
+    inputs.statorCurrentAmps = motor.getOutputCurrent();
+    inputs.tempCelsius = motor.getMotorTemperature();
+    inputs.supplyCurrentAmps = motor.getOutputCurrent();
 
     // update configuration if tunables have changed
     if (kP.hasChanged() || kI.hasChanged() || kD.hasChanged() || kPeakOutput.hasChanged()) {
