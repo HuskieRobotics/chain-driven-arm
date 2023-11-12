@@ -2,6 +2,7 @@ package frc.robot.subsystems.chainArm;
 
 import static frc.robot.subsystems.subsystem.SubsystemConstants.*;
 
+import com.ctre.phoenix.sensors.CANCoderConfiguration;
 import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -12,10 +13,17 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.EncoderType;
+import com.revrobotics.SparkMaxPIDController;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.SparkMaxRelativeEncoder.Type;
+
+import edu.wpi.first.hal.CANAPIJNI;
 import frc.lib.team3061.RobotConfig;
 import frc.lib.team3061.swerve.Conversions;
 import frc.lib.team6328.util.Alert;
 import frc.lib.team6328.util.Alert.AlertType;
+import frc.robot.commands.FeedForwardCharacterization;
 import frc.lib.team6328.util.TunableNumber;
 
 /** TalonFX implementation of the generic SubsystemIO */
@@ -51,10 +59,8 @@ public class ChainDrivenArmIOneo implements ChainDrivenArmIO {
     inputs.positionRad =
         Conversions.neoRotationsToMechanismRadians(motor.getEncoder().getPosition(), GEAR_RATIO);
     inputs.velocityRPM = motor.getEncoder().getVelocity();
-    inputs.closedLoopError =
-        motor.getEncoder(null, MOTOR_CAN_ID).getPosition()
-            - setPoint; // FIXME what is the closed loop method for neos
-    inputs.setpoint = motor.getClosedLoopReference().getValue();
+    inputs.setpoint = motor.getClosedLoopReference().getValue(); // fixme Not sure what this is supposed to do
+    inputs.closedLoopError = motor.getEncoder().getPosition() - inputs.setpoint;
     inputs.power = motor.getAppliedOutput();
     inputs.controlMode = motor.getMotorType().toString();
     inputs.statorCurrentAmps = motor.getOutputCurrent();
@@ -63,13 +69,14 @@ public class ChainDrivenArmIOneo implements ChainDrivenArmIO {
 
     // update configuration if tunables have changed
     if (kP.hasChanged() || kI.hasChanged() || kD.hasChanged() || kPeakOutput.hasChanged()) {
-      TalonFXConfiguration config = new TalonFXConfiguration();
-      this.motor.getConfigurator().refresh(config);
-      config.Slot0.kP = kP.get();
-      config.Slot0.kI = kI.get();
-      config.Slot0.kD = kD.get();
-      config.Voltage.PeakForwardVoltage = kPeakOutput.get();
-      config.Voltage.PeakReverseVoltage = kPeakOutput.get();
+      SparkMaxPIDController m_pidController = motor.getPIDController();
+      
+      m_pidController.setP(kP.get());
+      m_pidController.setI(kI.get());
+      m_pidController.setD(kD.get());
+      m_pidController.setFF(0); // FIXME What is the proper value?
+      m_pidController.setOutputRange(-kPeakOutput.get(), kPeakOutput.get());
+      
       this.motor.getConfigurator().apply(config);
     }
   }
@@ -110,7 +117,7 @@ public class ChainDrivenArmIOneo implements ChainDrivenArmIO {
 
   private void configMotor(int motorID) {
 
-    this.motor = new TalonFX(motorID, RobotConfig.getInstance().getCANBusName());
+    this.motor = new CANSparkMax(motorID, MotorType.kBrushless);
 
     TalonFXConfiguration config = new TalonFXConfiguration();
 
