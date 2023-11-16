@@ -15,10 +15,12 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.EncoderType;
 import com.revrobotics.SparkMaxPIDController;
+import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.SparkMaxRelativeEncoder.Type;
 
 import edu.wpi.first.hal.CANAPIJNI;
+import edu.wpi.first.wpilibj.motorcontrol.Talon;
 import frc.lib.team3061.RobotConfig;
 import frc.lib.team3061.swerve.Conversions;
 import frc.lib.team6328.util.Alert;
@@ -29,7 +31,6 @@ import frc.lib.team6328.util.TunableNumber;
 /** TalonFX implementation of the generic SubsystemIO */
 public class ChainDrivenArmIOneo implements ChainDrivenArmIO {
   private CANSparkMax motor;
-  private CANSparkMax.ControlType controlType;
 
   private VoltageOut voltageRequest;
   private TorqueCurrentFOC currentRequest;
@@ -59,7 +60,9 @@ public class ChainDrivenArmIOneo implements ChainDrivenArmIO {
     inputs.positionRad =
         Conversions.neoRotationsToMechanismRadians(motor.getEncoder().getPosition(), GEAR_RATIO);
     inputs.velocityRPM = motor.getEncoder().getVelocity();
-    inputs.setpoint = motor.getClosedLoopReference().getValue(); // fixme Not sure what this is supposed to do
+
+    //motor.getPIDController().; 
+    //inputs.setpoint = motor2.getClosedLoopReference().getValue(); // fixme Not sure what this is supposed to do
     inputs.closedLoopError = motor.getEncoder().getPosition() - inputs.setpoint;
     inputs.power = motor.getAppliedOutput();
     inputs.controlMode = motor.getMotorType().toString();
@@ -77,7 +80,8 @@ public class ChainDrivenArmIOneo implements ChainDrivenArmIO {
       m_pidController.setFF(0); // FIXME What is the proper value?
       m_pidController.setOutputRange(-kPeakOutput.get(), kPeakOutput.get());
       
-      this.motor.getConfigurator().apply(config);
+      //motor.getConfigurator().apply(config); //Keeping this code for now, 
+      //not sure if I need to call an update method
     }
   }
 
@@ -98,7 +102,7 @@ public class ChainDrivenArmIOneo implements ChainDrivenArmIO {
    */
   @Override
   public void setMotorCurrent(double current) {
-    this.motor.set(currentRequest.withOutput(current));
+    this.motor.set(current);
   }
 
   /**
@@ -108,32 +112,43 @@ public class ChainDrivenArmIOneo implements ChainDrivenArmIO {
    * @param arbitraryFeedForward the arbitrary feed forward as a percentage of maximum power
    */
   @Override
-  public void setMotorPosition(double position, double arbitraryFeedForward) {
-    this.motor.setControl(
-        positionRequest
-            .withPosition(Conversions.degreesToFalconRotations(position, GEAR_RATIO))
-            .withFeedForward(arbitraryFeedForward));
+  public void setMotorPosition(double position) {
+    this.motor.getPIDController().setReference(position, ControlType.kPosition);
   }
 
   private void configMotor(int motorID) {
 
+    SparkMaxPIDController m_pidController = motor.getPIDController();
+      
+    m_pidController.setP(kP.get());
+    m_pidController.setI(kI.get());
+    m_pidController.setD(kD.get());
+    m_pidController.setFF(0); // FIXME What is the proper value?
+    m_pidController.setOutputRange(-kPeakOutput.get(), kPeakOutput.get());
+// below is original
+
     this.motor = new CANSparkMax(motorID, MotorType.kBrushless);
 
     TalonFXConfiguration config = new TalonFXConfiguration();
-
-    CurrentLimitsConfigs currentLimits = new CurrentLimitsConfigs();
-    currentLimits.SupplyCurrentLimit = CONTINUOUS_CURRENT_LIMIT;
+    this.motor.setSmartCurrentLimit(CONTINUOUS_CURRENT_LIMIT); // FIXME I added this to limit current
+    
+    CurrentLimitsConfigs currentLimits = new CurrentLimitsConfigs(); 
+    currentLimits.SupplyCurrentLimit = CONTINUOUS_CURRENT_LIMIT; // FIXME Not sure how to do this?
     currentLimits.SupplyCurrentThreshold = PEAK_CURRENT_LIMIT;
     currentLimits.SupplyTimeThreshold = PEAK_CURRENT_DURATION;
     currentLimits.SupplyCurrentLimitEnable = true;
     config.CurrentLimits = currentLimits;
 
+  
+
+
     config.MotorOutput.Inverted =
         MOTOR_INVERTED ? InvertedValue.Clockwise_Positive : InvertedValue.CounterClockwise_Positive;
     config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-    config.Slot0.kP = kP.get();
-    config.Slot0.kI = kI.get();
-    config.Slot0.kD = kD.get();
+    
+    m_pidController.setP(kP.get());
+    m_pidController.setI(kI.get());
+    m_pidController.setD(kD.get());
 
     config.Voltage.PeakForwardVoltage = kPeakOutput.get();
     config.Voltage.PeakReverseVoltage = kPeakOutput.get();

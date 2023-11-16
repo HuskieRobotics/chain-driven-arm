@@ -52,5 +52,5 @@ public interface ChainDrivenArmIO {
    * @param position the position to set the motor to in degrees
    * @param arbitraryFeedForward the arbitrary feed forward as a percentage of maximum power
    */
-  public default void setMotorPosition(double position, double arbitraryFeedForward) {}
+  public default void setMotorPosition(double position) {}
 }
