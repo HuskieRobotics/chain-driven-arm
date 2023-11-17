@@ -6,6 +6,8 @@ import org.littletonrobotics.junction.AutoLog;
 public interface ChainDrivenArmIO {
   /** Contains all of the input data received from hardware. */
   @AutoLog
+  // FIXME: re-evaluate based on what units we want (degreees vs. radians)
+  // FIXME: delete properties that aren't supported by Rev
   public static class ChainDrivenArmIOInputs {
     double positionRad = 0.0;
     double velocityRPM = 0.0;
@@ -44,13 +46,10 @@ public interface ChainDrivenArmIO {
    */
   public default void setMotorPower(double power) {}
 
-  public default void setMotorCurrent(double current) {}
-
   /**
    * Set the arm position in degrees above the horizontal
    *
    * @param position the position to set the motor to in degrees
-   * @param arbitraryFeedForward the arbitrary feed forward as a percentage of maximum power
    */
   public default void setMotorPosition(double position) {}
 }

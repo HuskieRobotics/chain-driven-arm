@@ -1,5 +1,6 @@
 package frc.robot.subsystems.chainArm;
 
+// FIXME: rename to ChainDrivenArmConstants
 public class SubsystemConstants {
 
   private static final String CONSTRUCTOR_EXCEPTION = "constant class";
@@ -10,6 +11,7 @@ public class SubsystemConstants {
 
   public static final boolean DEBUGGING = false;
   public static final boolean TESTING = false;
+  // FIXME: rename to "Chain Driven Arm"
   public static final String SUBSYSTEM_NAME = "Subsystem";
 
   public static final int MOTOR_CAN_ID = 20;
@@ -19,6 +21,7 @@ public class SubsystemConstants {
   public static final double POSITION_PID_P = 0.0;
   public static final double POSITION_PID_I = 0;
   public static final double POSITION_PID_D = 0;
+  // FIXME: set to a very small value to start 0.1?
   public static final double POSITION_PID_PEAK_OUTPUT = 1.0;
   public static final double POSITION_FEEDFORWARD = 0;
 
