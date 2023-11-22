@@ -1,6 +1,8 @@
-package frc.robot.subsystems.chainArm;
+package frc.robot.subsystems.arm;
 
 import org.littletonrobotics.junction.AutoLog;
+
+import frc.robot.subsystems.chainArm.ChainDrivenArmIOInputsAutoLogged;
 
 /** Generic subsystem hardware interface. */
 public interface ChainDrivenArmIO {
@@ -21,7 +23,7 @@ public interface ChainDrivenArmIO {
   }
 
   /** Updates the set of loggable inputs. */
-  public default void updateInputs(ChainDrivenArmIOInputs inputs) {}
+  public default void updateInputs(ChainDrivenArmIOInputsAutoLogged inputs) {}
 
   // FOR TYLER:
   // IMPLEMENT THIS METHOD

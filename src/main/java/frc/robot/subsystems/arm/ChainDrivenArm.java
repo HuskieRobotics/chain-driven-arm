@@ -1,4 +1,4 @@
-package frc.robot.subsystems.chainArm;
+package frc.robot.subsystems.arm;
 
 import static frc.robot.subsystems.subsystem.SubsystemConstants.*;
 
@@ -6,6 +6,8 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.team6328.util.TunableNumber;
+import frc.robot.subsystems.chainArm.ChainDrivenArmIOInputsAutoLogged;
+
 import org.littletonrobotics.junction.Logger;
 
 /**
