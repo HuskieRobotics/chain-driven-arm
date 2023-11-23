@@ -19,11 +19,11 @@ public class ChainDrivenArmConstants {
   public static final int MOTOR_THREE_ID = 0;
   public static final int MOTOR_FOUR_ID = 0;
 
-  public static final double GEAR_RATIO = 100.0;
+  public static final double GEAR_RATIO = 160;  // 20:1 for the gears in motors * 4:1 for a shaft * 2:1 sproket
   public static final boolean MOTOR_INVERTED = false;
 
   public static final int COUNTS_PER_REV = 8192; //FIXME: took this # from a SPARK_MAX example
-  public static final CANSparkMax.IdleMode MODE = CANSparkMax.IdleMode.kCoast;
+  public static final CANSparkMax.IdleMode MODE = CANSparkMax.IdleMode.kBrake;
 
   public static final double POSITION_PID_P = 0.0;
   public static final double POSITION_PID_I = 0;

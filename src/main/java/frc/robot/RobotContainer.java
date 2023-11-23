@@ -12,10 +12,13 @@ import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.commands.FollowPathWithEvents;
 import com.pathplanner.lib.server.PathPlannerServer;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -34,6 +37,7 @@ import frc.lib.team3061.vision.VisionIO;
 import frc.lib.team3061.vision.VisionIOPhotonVision;
 import frc.lib.team3061.vision.VisionIOSim;
 import frc.robot.Constants.Mode;
+import frc.robot.commands.ArmToPose;
 import frc.robot.commands.FeedForwardCharacterization;
 import frc.robot.commands.FeedForwardCharacterization.FeedForwardCharacterizationData;
 import frc.robot.commands.FollowPath;
@@ -44,6 +48,9 @@ import frc.robot.configs.MK4IRobotConfig;
 import frc.robot.configs.NovaRobotConfig;
 import frc.robot.operator_interface.OISelector;
 import frc.robot.operator_interface.OperatorInterface;
+import frc.robot.subsystems.arm.ChainDrivenArm;
+import frc.robot.subsystems.arm.ChainDrivenArmConstants;
+import frc.robot.subsystems.arm.ChainDrivenArmIO;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.subsystem.Subsystem;
 import frc.robot.subsystems.subsystem.SubsystemIO;
@@ -66,7 +73,9 @@ public class RobotContainer {
   private Drivetrain drivetrain;
   private Alliance lastAlliance = DriverStation.Alliance.Invalid;
   private Vision vision;
-  private Subsystem subsystem;
+  private ChainDrivenArm arm;
+  
+
 
   // use AdvantageKit's LoggedDashboardChooser instead of SendableChooser to ensure accurate logging
   private final LoggedDashboardChooser<Command> autoChooser =
@@ -153,7 +162,7 @@ public class RobotContainer {
             }
             vision = new Vision(visionIOs);
             // subsystem = new Subsystem(new SubsystemIOTalonFX());
-            subsystem = new Subsystem(new SubsystemIO() {});
+            arm = new ChainDrivenArm(new ChainDrivenArmIO() {});
 
             if (Constants.getRobot() == Constants.RobotType.ROBOT_DEFAULT) {
               new Pneumatics(new PneumaticsIORev());
@@ -180,7 +189,7 @@ public class RobotContainer {
                           drivetrain::getPose,
                           RobotConfig.getInstance().getRobotToCameraTransforms()[0])
                     });
-            subsystem = new Subsystem(new SubsystemIO() {});
+            arm = new ChainDrivenArm(new ChainDrivenArmIO() {});
 
             break;
           }
@@ -208,7 +217,7 @@ public class RobotContainer {
         visionIOs[i] = new VisionIO() {};
       }
       vision = new Vision(visionIOs);
-      subsystem = new Subsystem(new SubsystemIO() {});
+      arm = new ChainDrivenArm(new ChainDrivenArmIO() {});
     }
 
     // disable all telemetry in the LiveWindow to reduce the processing during each iteration
@@ -312,17 +321,17 @@ public class RobotContainer {
 
     configureDrivetrainCommands();
 
-    configureSubsystemCommands();
+    configureChainDrivenArmCommands();
 
     configureVisionCommands();
 
-    // interrupt all commands by running a command that requires every subsystem. This is used to
+    // interrupt all commands by running a command that requires every arm. This is used to
     // recover to a known state if the robot becomes "stuck" in a command.
     oi.getInterruptAll()
         .onTrue(
             Commands.parallel(
                 Commands.runOnce(drivetrain::disableXstance),
-                Commands.runOnce(() -> subsystem.setMotorPower(0)),
+                Commands.runOnce(() -> arm.setMotorPower(0)),
                 new TeleopSwerve(drivetrain, oi::getTranslateX, oi::getTranslateY, oi::getRotate)));
   }
 
@@ -505,8 +514,20 @@ public class RobotContainer {
     oi.getTurboButton().onFalse(Commands.runOnce(drivetrain::disableTurbo, drivetrain));
   }
 
-  private void configureSubsystemCommands() {
-    // FIXME: add commands for the subsystem
+  private void configureChainDrivenArmCommands() {
+    Shuffleboard.getTab("Arm Position")
+      .add("Set Position", 0)
+      .withWidget(BuiltInWidgets.kNumberSlider)
+      .withProperties(Map.of("min", 0, "max", 180))
+      .getEntry();
+    SmartDashboard.putData("Arm: start", new ArmToPose(arm, Shuffleboard.getTab("Arm Position")));
+
+    Shuffleboard.getTab("Arm Power")
+      .add("Set Power", 0)
+      .withWidget(BuiltInWidgets.kNumberSlider)
+      .withProperties(Map.of("min", -1, "max", 1))
+      .getEntry();  
+
   }
 
   private void configureVisionCommands() {
@@ -529,7 +550,7 @@ public class RobotContainer {
   }
 
   /**
-   * Check if the alliance color has changed; if so, update the vision subsystem and Field2d
+   * Check if the alliance color has changed; if so, update the vision arm and Field2d
    * singleton.
    */
   public void checkAllianceColor() {
@@ -541,7 +562,7 @@ public class RobotContainer {
   }
 
   public void autonomousInit() {
-    // when the LED subsystem is pulled in, we will change the LEDs here
+    // when the LED arm is pulled in, we will change the LEDs here
   }
 
   public void teleopInit() {

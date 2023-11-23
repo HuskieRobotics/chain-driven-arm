@@ -37,6 +37,8 @@ public interface ChainDrivenArmIO {
    * @param position the position to set the motor to in degrees
    */
   public default void setMotorPosition(double position) {}
+
+  public default double getPosition() {return 0;}
   
   public default boolean atPosition() {return false;}
 }

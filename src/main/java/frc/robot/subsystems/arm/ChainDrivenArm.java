@@ -81,7 +81,9 @@ public class ChainDrivenArm extends SubsystemBase {
   public void setMotorPosition(double position) {
     io.setMotorPosition(position);
   }
-
+  public double getPosition() {
+    return io.getPosition();
+  }
   public boolean isAtPosition(){
     return io.atPosition();
   }
