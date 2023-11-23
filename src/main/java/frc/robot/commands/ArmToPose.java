@@ -4,12 +4,16 @@
 
 package frc.robot.commands;
 
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.subsystems.arm.ChainDrivenArm;
 
 public class ArmToPose extends CommandBase {
   /** Creates a new ArmToPose. */
 
-  public double angle;
+  protected ChainDrivenArm arm;
+  public double angle; // degrees
 
   public ArmToPose(double angleDegrees) {
     // Use addRequirements() here to declare subsystem dependencies.
@@ -18,11 +22,17 @@ public class ArmToPose extends CommandBase {
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() {
+
+    Logger.getInstance().recordOutput("ActiveCommands/SetArmPose", true);
+
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {}
+  public void execute() {
+    this.arm.setMotorPosition(angle);
+  }
 
   // Called once the command ends or is interrupted.
   @Override
@@ -31,6 +41,6 @@ public class ArmToPose extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return arm.atPosition();
   }
 }

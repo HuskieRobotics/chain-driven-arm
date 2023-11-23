@@ -20,8 +20,7 @@ public class ChainDrivenArm extends SubsystemBase {
   // these Tunables are convenient when testing as they provide direct control of the subsystem's
   // motor
   private final TunableNumber motorPower = new TunableNumber("Subsystem/power", 0.0);
-  // FIXME: remove current tuneable
-  private final TunableNumber motorCurrent = new TunableNumber("Subsystem/current", 0.0);
+  
   private final TunableNumber motorPosition = new TunableNumber("Subsystem/position", 0.0);
 
   private final ChainDrivenArmIOInputsAutoLogged inputs = new ChainDrivenArmIOInputsAutoLogged();
@@ -81,5 +80,9 @@ public class ChainDrivenArm extends SubsystemBase {
    */
   public void setMotorPosition(double position) {
     io.setMotorPosition(position);
+  }
+
+  public boolean isAtPosition(){
+    return io.atPosition();
   }
 }

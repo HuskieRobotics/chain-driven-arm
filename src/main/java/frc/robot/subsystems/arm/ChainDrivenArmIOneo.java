@@ -48,17 +48,15 @@ public class ChainDrivenArmIOneo implements ChainDrivenArmIO {
    * @param inputs the inputs object to update
    */
   @Override
-  public void updateInputs(ChainDrivenArmIOInputsAutoLogged inputs) {
-    inputs.positionRad =
-        Conversions.neoRotationsToMechanismRadians(motorOne.getEncoder().getPosition(), GEAR_RATIO);
-    inputs.velocityRPM = motorOne.getEncoder().getVelocity();
+  public void updateInputs(ChainDrivenArmIOInputsAutoLogged inputs) { // FIXME: why is this an error?
+    inputs.positionDeg = m_altEncoder.getPosition();                         // positionDeg
+    inputs.velocityRPM = m_altEncoder.getVelocity();                         // velocityRPM
+    inputs.closedLoopError = m_altEncoder.getPosition() - inputs.setpoint;   // closedLoopError
+    inputs.power = motorOne.getAppliedOutput();                              // power
+    inputs.controlMode = motorOne.getMotorType().toString();                 // motorType   0=brushed, 1=brushless
+    inputs.supplyCurrentAmps = motorOne.getOutputCurrent();                  // current/Amps
+    inputs.tempCelsius = motorOne.getMotorTemperature();                     // temp
     
-    inputs.closedLoopError = motorOne.getEncoder().getPosition() - inputs.setpoint;
-    inputs.power = motorOne.getAppliedOutput();
-    inputs.controlMode = motorOne.getMotorType().toString();
-    inputs.statorCurrentAmps = motorOne.getOutputCurrent();
-    inputs.tempCelsius = motorOne.getMotorTemperature();
-    inputs.supplyCurrentAmps = motorOne.getOutputCurrent();
 
     // update configuration if tunables have changed
     if (kP.hasChanged() || kI.hasChanged() || kD.hasChanged() || kPeakOutput.hasChanged()) {
@@ -68,7 +66,7 @@ public class ChainDrivenArmIOneo implements ChainDrivenArmIO {
       m_pidController.setP(kP.get());
       m_pidController.setI(kI.get());
       m_pidController.setD(kD.get());
-      m_pidController.setFF(0); // FIXME What is the proper value?
+      m_pidController.setFF(0); 
       m_pidController.setOutputRange(-kPeakOutput.get(), kPeakOutput.get());
       
     }
@@ -95,7 +93,12 @@ public class ChainDrivenArmIOneo implements ChainDrivenArmIO {
     this.m_pidController.setReference(position, ControlType.kPosition);
   }
 
-  // FIXME: update parameters to have 2 CAN IDs for both motors
+  @Override
+  public boolean atPosition(){
+    return (-1 <= m_altEncoder.getPosition()) && m_altEncoder.getPosition() <= 1;
+  }
+
+  
   private void configMotors(int motorOneID, int motorTwoID, int motorThreeID, int motorFourID) {
 
     

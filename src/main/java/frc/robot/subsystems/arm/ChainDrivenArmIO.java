@@ -11,35 +11,18 @@ public interface ChainDrivenArmIO {
   // FIXME: re-evaluate based on what units we want (degreees vs. radians)
   // FIXME: delete properties that aren't supported by Rev
   public static class ChainDrivenArmIOInputs {
-    double positionRad = 0.0;
+    double positionDeg = 0.0;
     double velocityRPM = 0.0;
     double closedLoopError = 0.0;
     double setpoint = 0.0;
     double power = 0.0;
     String controlMode = "";
-    double statorCurrentAmps = 0.0;
     double tempCelsius = 0.0;
     double supplyCurrentAmps = 0.0;
   }
 
   /** Updates the set of loggable inputs. */
   public default void updateInputs(ChainDrivenArmIOInputsAutoLogged inputs) {}
-
-  // FOR TYLER:
-  // IMPLEMENT THIS METHOD
-  // JUST FIND THE CanSparkMax method to set power and in teh ChainDrivenArmIOTalonFX.java file fill
-  // out this method
-  // ACTUALLY FIRST MAKE SURE YOU CHANGE THE MOTOR TYPES TO CanSparkMax IN THE
-  // ChainDrivenArmIOTalonFX.java FILE
-  // AND GET RID OF THE ERRORS
-
-  // ADDITIONALLY TAKE THIS ONE FILE AT A TIME
-  // START IN THIS FILE AND THEN PROCEED IN THIS ORDER:
-  // ChainDrivenArmIO.java
-  // ChainDrivenArmIOTalonFX.java
-  // ChainDrivenArm.java
-
-  // FILL OUT THE CONSTANTS CLASS AS NEEDED
 
   /**
    * Set the motor power to the specified percentage of maximum power.
@@ -54,4 +37,6 @@ public interface ChainDrivenArmIO {
    * @param position the position to set the motor to in degrees
    */
   public default void setMotorPosition(double position) {}
+  
+  public default boolean atPosition() {return false;}
 }
