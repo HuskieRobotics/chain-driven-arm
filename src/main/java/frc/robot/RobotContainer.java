@@ -12,12 +12,15 @@ import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.commands.FollowPathWithEvents;
 import com.pathplanner.lib.server.PathPlannerServer;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.shuffleboard.SimpleWidget;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -515,19 +518,29 @@ public class RobotContainer {
   }
 
   private void configureChainDrivenArmCommands() {
-    Shuffleboard.getTab("Arm Position")
-      .add("Set Position", 0)
-      .withWidget(BuiltInWidgets.kNumberSlider)
-      .withProperties(Map.of("min", 0, "max", 180))
-      .getEntry();
-    SmartDashboard.putData("Arm: start", new ArmToPose(arm, Shuffleboard.getTab("Arm Position")));
+    //Shuffleboard.getTab("Arm Position").add("Set Position", 0).withWidget(BuiltInWidgets.kNumberSlider).withProperties(Map.of("min", 0, "max", 180)).getEntry();
+    
+    // FIXME: Not sure if the tabs and widgets will work
 
-    Shuffleboard.getTab("Arm Power")
+    SimpleWidget armAngleSlider = Shuffleboard.getTab("Arm")
+      .add("Set Angle", 0)
+      .withWidget(BuiltInWidgets.kNumberSlider)
+      .withProperties(Map.of("min", 0, "max", 180));
+    double angle = armAngleSlider.getEntry().getDouble(0);  // angle from slider
+
+    Shuffleboard.getTab("Arm")
+      .add("Move Arm", false)
+      .withWidget(BuiltInWidgets.kCommand)
+      .withProperties((Map.of("Start", new ArmToPose(arm, angle)))); // pass angle into command
+
+    // SmartDashboard.putData("Arm: start", new ArmToPose(arm, angle));
+
+    SimpleWidget armPowerSlider = Shuffleboard.getTab("Arm")
       .add("Set Power", 0)
       .withWidget(BuiltInWidgets.kNumberSlider)
-      .withProperties(Map.of("min", -1, "max", 1))
-      .getEntry();  
-
+      .withProperties(Map.of("min", -1, "max", 1));
+    double power = armPowerSlider.getEntry().getDouble(0); // power from slider
+    arm.setMotorPower(power);  // set power of motor
   }
 
   private void configureVisionCommands() {
