@@ -17,9 +17,9 @@ public class ChainDrivenArm extends SubsystemBase {
 
   // these Tunables are convenient when testing as they provide direct control of the subsystem's
   // motor
-  private final TunableNumber motorPower = new TunableNumber("Subsystem/power", 0.0);
+  private final TunableNumber motorPower = new TunableNumber("ChainDrivenArm/power", 0.0);
 
-  private final TunableNumber motorPosition = new TunableNumber("Subsystem/position", 0.0);
+  private final TunableNumber motorPosition = new TunableNumber("ChainDrivenArm/position", 0.0);
 
   private final ChainDrivenArmIOInputsAutoLogged inputs = new ChainDrivenArmIOInputsAutoLogged();
   private ChainDrivenArmIO io;
@@ -35,7 +35,7 @@ public class ChainDrivenArm extends SubsystemBase {
 
     // Create a Shuffleboard tab for this subsystem if testing is enabled. Add additional indicators
     // and controls as needed.
-    if (TESTING) {
+    if (ChainDrivenArmConstants.TESTING) {
       ShuffleboardTab tab = Shuffleboard.getTab(SUBSYSTEM_NAME);
       tab.add(SUBSYSTEM_NAME, this);
     }
@@ -51,7 +51,7 @@ public class ChainDrivenArm extends SubsystemBase {
     Logger.getInstance().processInputs(SUBSYSTEM_NAME, inputs);
 
     // when testing, set the motor power, current, or position based on the Tunables (if non-zero)
-    if (TESTING) {
+    if (ChainDrivenArmConstants.TESTING) {
       if (motorPower.get() != 0) {
         this.setMotorPower(motorPower.get());
       }

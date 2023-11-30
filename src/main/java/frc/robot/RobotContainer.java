@@ -49,6 +49,7 @@ import frc.robot.operator_interface.OISelector;
 import frc.robot.operator_interface.OperatorInterface;
 import frc.robot.subsystems.arm.ChainDrivenArm;
 import frc.robot.subsystems.arm.ChainDrivenArmIO;
+import frc.robot.subsystems.arm.ChainDrivenArmIOneo;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -156,7 +157,7 @@ public class RobotContainer {
             }
             vision = new Vision(visionIOs);
             // subsystem = new Subsystem(new SubsystemIOTalonFX());
-            arm = new ChainDrivenArm(new ChainDrivenArmIO() {});
+            arm = new ChainDrivenArm(new ChainDrivenArmIOneo() {});
 
             if (Constants.getRobot() == Constants.RobotType.ROBOT_DEFAULT) {
               new Pneumatics(new PneumaticsIORev());
@@ -515,27 +516,28 @@ public class RobotContainer {
 
     // FIXME: Not sure if the tabs and widgets will work
 
-    SimpleWidget armAngleSlider =
-        Shuffleboard.getTab("Arm")
-            .add("Set Angle", 0)
-            .withWidget(BuiltInWidgets.kNumberSlider)
-            .withProperties(Map.of("min", 0, "max", 180));
-    double angle = armAngleSlider.getEntry().getDouble(0); // angle from slider
+    // SimpleWidget armAngleSlider =
+    //     Shuffleboard.getTab("Arm")
+    //         .add("Set Angle", 0)
+    //         .withWidget(BuiltInWidgets.kNumberSlider)
+    //         .withProperties(Map.of("min", 0, "max", 180));
+    // double angle = armAngleSlider.getEntry().getDouble(0); // angle from slider
 
-    Shuffleboard.getTab("Arm")
-        .add("Move Arm", false)
-        .withWidget(BuiltInWidgets.kCommand)
-        .withProperties((Map.of("Start", new ArmToPose(arm, angle)))); // pass angle into command
+    // // Shuffleboard.getTab("Arm")
+    // //     .add("Move Arm", false)
+    // //     .withWidget(BuiltInWidgets.kCommand)
+    // //     .withProperties((Map.of("Start", new ArmToPose(arm, angle)))); // pass angle into command
 
-    // SmartDashboard.putData("Arm: start", new ArmToPose(arm, angle));
+    // // SmartDashboard.putData("Arm: start", new ArmToPose(arm, angle));
 
-    SimpleWidget armPowerSlider =
-        Shuffleboard.getTab("Arm")
-            .add("Set Power", 0)
-            .withWidget(BuiltInWidgets.kNumberSlider)
-            .withProperties(Map.of("min", -1, "max", 1));
-    double power = armPowerSlider.getEntry().getDouble(0); // power from slider
-    arm.setMotorPower(power); // set power of motor
+    // SimpleWidget armPowerSlider =
+    //     Shuffleboard.getTab("Arm")
+    //         .add("Set Power", 0)
+    //         .withWidget(BuiltInWidgets.kNumberSlider)
+    //         .withProperties(Map.of("min", -1, "max", 1));
+    // double power = armPowerSlider.getEntry().getDouble(0); // power from slider
+    // arm.setMotorPower(power); // set power of motor
+    // System.out.println(power);
   }
 
   private void configureVisionCommands() {

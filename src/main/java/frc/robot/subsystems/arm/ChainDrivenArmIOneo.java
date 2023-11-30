@@ -33,13 +33,12 @@ public class ChainDrivenArmIOneo implements ChainDrivenArmIO {
 
   /** Create a TalonFX-specific generic SubsystemIO */
   public ChainDrivenArmIOneo() {
+    configMotors(MOTOR_ONE_ID, MOTOR_TWO_ID, MOTOR_THREE_ID, MOTOR_FOUR_ID);
     this.m_altEncoder =
         motorOne.getAlternateEncoder(
             SparkMaxAlternateEncoder.Type.kQuadrature,
             COUNTS_PER_REV); // FIXME: 2nd param is using gear ratio for counts per rev
     this.m_pidController.setFeedbackDevice(m_altEncoder);
-
-    configMotors(MOTOR_ONE_ID, MOTOR_TWO_ID, MOTOR_THREE_ID, MOTOR_FOUR_ID);
   }
 
   /**
@@ -131,6 +130,5 @@ public class ChainDrivenArmIOneo implements ChainDrivenArmIO {
     // below is original
 
     this.motorOne.setSmartCurrentLimit(CONTINUOUS_CURRENT_LIMIT);
-    motorOne.setIdleMode(MODE);
   }
 }
