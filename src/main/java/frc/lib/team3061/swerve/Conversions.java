@@ -79,11 +79,11 @@ public class Conversions {
     return rpmToFalconRPS(wheelRPM, gearRatio);
   }
 
-  public static double neoRotationsToMechanismRadians(double neoRotations, double gearRatio){
+  public static double neoRotationsToMechanismRadians(double neoRotations, double gearRatio) {
     return (neoRotations * 2 * Math.PI) / gearRatio;
   }
-  
-  public static double neoRPSToMechanismRPM(double neoRPS, double gearRatio){
+
+  public static double neoRPSToMechanismRPM(double neoRPS, double gearRatio) {
     double motorRPM = neoRPS * 60.0;
     return motorRPM / gearRatio;
   }

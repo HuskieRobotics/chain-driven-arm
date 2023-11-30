@@ -2,8 +2,6 @@ package frc.robot.subsystems.arm;
 
 import org.littletonrobotics.junction.AutoLog;
 
-import frc.robot.subsystems.chainArm.ChainDrivenArmIOInputsAutoLogged;
-
 /** Generic subsystem hardware interface. */
 public interface ChainDrivenArmIO {
   /** Contains all of the input data received from hardware. */
@@ -38,7 +36,11 @@ public interface ChainDrivenArmIO {
    */
   public default void setMotorPosition(double position) {}
 
-  public default double getPosition() {return 0;}
-  
-  public default boolean atPosition() {return false;}
+  public default double getPosition() {
+    return 0;
+  }
+
+  public default boolean atPosition() {
+    return false;
+  }
 }

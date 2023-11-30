@@ -6,8 +6,6 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.team6328.util.TunableNumber;
-import frc.robot.subsystems.chainArm.ChainDrivenArmIOInputsAutoLogged;
-
 import org.littletonrobotics.junction.Logger;
 
 /**
@@ -20,7 +18,7 @@ public class ChainDrivenArm extends SubsystemBase {
   // these Tunables are convenient when testing as they provide direct control of the subsystem's
   // motor
   private final TunableNumber motorPower = new TunableNumber("Subsystem/power", 0.0);
-  
+
   private final TunableNumber motorPosition = new TunableNumber("Subsystem/position", 0.0);
 
   private final ChainDrivenArmIOInputsAutoLogged inputs = new ChainDrivenArmIOInputsAutoLogged();
@@ -81,10 +79,12 @@ public class ChainDrivenArm extends SubsystemBase {
   public void setMotorPosition(double position) {
     io.setMotorPosition(position);
   }
+
   public double getPosition() {
     return io.getPosition();
   }
-  public boolean isAtPosition(){
+
+  public boolean isAtPosition() {
     return io.atPosition();
   }
 }

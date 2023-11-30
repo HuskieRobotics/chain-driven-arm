@@ -4,16 +4,14 @@
 
 package frc.robot.commands;
 
-import org.littletonrobotics.junction.Logger;
-import java.util.function.Supplier;
-
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.arm.ChainDrivenArm;
+import org.littletonrobotics.junction.Logger;
 
 public class ArmToPose extends CommandBase {
   /** Creates a new ArmToPose. */
-
   protected ChainDrivenArm arm;
+
   private double angle; // degrees
 
   public ArmToPose(ChainDrivenArm subsystem, double angleDegrees) {

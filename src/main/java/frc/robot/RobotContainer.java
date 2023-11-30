@@ -12,16 +12,12 @@ import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.commands.FollowPathWithEvents;
 import com.pathplanner.lib.server.PathPlannerServer;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
-import edu.wpi.first.networktables.GenericEntry;
-import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.shuffleboard.SimpleWidget;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -52,11 +48,8 @@ import frc.robot.configs.NovaRobotConfig;
 import frc.robot.operator_interface.OISelector;
 import frc.robot.operator_interface.OperatorInterface;
 import frc.robot.subsystems.arm.ChainDrivenArm;
-import frc.robot.subsystems.arm.ChainDrivenArmConstants;
 import frc.robot.subsystems.arm.ChainDrivenArmIO;
 import frc.robot.subsystems.drivetrain.Drivetrain;
-import frc.robot.subsystems.subsystem.Subsystem;
-import frc.robot.subsystems.subsystem.SubsystemIO;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -77,8 +70,6 @@ public class RobotContainer {
   private Alliance lastAlliance = DriverStation.Alliance.Invalid;
   private Vision vision;
   private ChainDrivenArm arm;
-  
-
 
   // use AdvantageKit's LoggedDashboardChooser instead of SendableChooser to ensure accurate logging
   private final LoggedDashboardChooser<Command> autoChooser =
@@ -518,29 +509,33 @@ public class RobotContainer {
   }
 
   private void configureChainDrivenArmCommands() {
-    //Shuffleboard.getTab("Arm Position").add("Set Position", 0).withWidget(BuiltInWidgets.kNumberSlider).withProperties(Map.of("min", 0, "max", 180)).getEntry();
-    
+    // Shuffleboard.getTab("Arm Position").add("Set Position",
+    // 0).withWidget(BuiltInWidgets.kNumberSlider).withProperties(Map.of("min", 0, "max",
+    // 180)).getEntry();
+
     // FIXME: Not sure if the tabs and widgets will work
 
-    SimpleWidget armAngleSlider = Shuffleboard.getTab("Arm")
-      .add("Set Angle", 0)
-      .withWidget(BuiltInWidgets.kNumberSlider)
-      .withProperties(Map.of("min", 0, "max", 180));
-    double angle = armAngleSlider.getEntry().getDouble(0);  // angle from slider
+    SimpleWidget armAngleSlider =
+        Shuffleboard.getTab("Arm")
+            .add("Set Angle", 0)
+            .withWidget(BuiltInWidgets.kNumberSlider)
+            .withProperties(Map.of("min", 0, "max", 180));
+    double angle = armAngleSlider.getEntry().getDouble(0); // angle from slider
 
     Shuffleboard.getTab("Arm")
-      .add("Move Arm", false)
-      .withWidget(BuiltInWidgets.kCommand)
-      .withProperties((Map.of("Start", new ArmToPose(arm, angle)))); // pass angle into command
+        .add("Move Arm", false)
+        .withWidget(BuiltInWidgets.kCommand)
+        .withProperties((Map.of("Start", new ArmToPose(arm, angle)))); // pass angle into command
 
     // SmartDashboard.putData("Arm: start", new ArmToPose(arm, angle));
 
-    SimpleWidget armPowerSlider = Shuffleboard.getTab("Arm")
-      .add("Set Power", 0)
-      .withWidget(BuiltInWidgets.kNumberSlider)
-      .withProperties(Map.of("min", -1, "max", 1));
+    SimpleWidget armPowerSlider =
+        Shuffleboard.getTab("Arm")
+            .add("Set Power", 0)
+            .withWidget(BuiltInWidgets.kNumberSlider)
+            .withProperties(Map.of("min", -1, "max", 1));
     double power = armPowerSlider.getEntry().getDouble(0); // power from slider
-    arm.setMotorPower(power);  // set power of motor
+    arm.setMotorPower(power); // set power of motor
   }
 
   private void configureVisionCommands() {
@@ -563,8 +558,7 @@ public class RobotContainer {
   }
 
   /**
-   * Check if the alliance color has changed; if so, update the vision arm and Field2d
-   * singleton.
+   * Check if the alliance color has changed; if so, update the vision arm and Field2d singleton.
    */
   public void checkAllianceColor() {
     if (DriverStation.getAlliance() != lastAlliance) {
