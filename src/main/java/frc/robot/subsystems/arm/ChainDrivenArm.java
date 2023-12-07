@@ -17,7 +17,7 @@ public class ChainDrivenArm extends SubsystemBase {
 
   // these Tunables are convenient when testing as they provide direct control of the subsystem's
   // motor
-  private final TunableNumber motorPower = new TunableNumber("ChainDrivenArm/power", 0.0);
+  private final TunableNumber ArmMotorPower = new TunableNumber("ChainDrivenArm/power", 0.0);
 
   private final TunableNumber motorPosition = new TunableNumber("ChainDrivenArm/position", 0.0);
 
@@ -48,12 +48,13 @@ public class ChainDrivenArm extends SubsystemBase {
   @Override
   public void periodic() {
     io.updateInputs(inputs);
-    Logger.getInstance().processInputs(SUBSYSTEM_NAME, inputs);
+    Logger.getInstance().processInputs("ChainDrivenArm", inputs);
 
+    double mp = ArmMotorPower.get();
     // when testing, set the motor power, current, or position based on the Tunables (if non-zero)
     if (ChainDrivenArmConstants.TESTING) {
-      if (motorPower.get() != 0) {
-        this.setMotorPower(motorPower.get());
+      if (mp != 0) {
+        this.setMotorPower(mp);
       }
 
       if (motorPosition.get() != 0) {

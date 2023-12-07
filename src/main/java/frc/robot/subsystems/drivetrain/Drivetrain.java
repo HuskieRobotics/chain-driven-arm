@@ -6,7 +6,6 @@ package frc.robot.subsystems.drivetrain;
 
 import static frc.robot.Constants.*;
 
-import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.pathplanner.lib.PathPlannerTrajectory.PathPlannerState;
 import edu.wpi.first.math.controller.PIDController;
@@ -35,7 +34,6 @@ import frc.lib.team3061.util.RobotOdometry;
 import frc.lib.team6328.util.Alert;
 import frc.lib.team6328.util.Alert.AlertType;
 import frc.lib.team6328.util.TunableNumber;
-import frc.robot.Constants;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
@@ -490,73 +488,75 @@ public class Drivetrain extends SubsystemBase {
   public void periodic() {
 
     // synchronize all of the signals related to pose estimation
-    if (RobotConfig.getInstance().getPhoenix6Licensed()) {
-      // this is a licensed method
-      BaseStatusSignal.waitForAll(
-          Constants.LOOP_PERIOD_SECS, this.odometrySignals.toArray(new BaseStatusSignal[0]));
-    }
+    // if (RobotConfig.getInstance().getPhoenix6Licensed()) {
+    //   // this is a licensed method
+    //   BaseStatusSignal.waitForAll(
+    //       Constants.LOOP_PERIOD_SECS, this.odometrySignals.toArray(new BaseStatusSignal[0]));
+    // }
 
-    // update and log gyro inputs
-    gyroIO.updateInputs(gyroInputs);
-    Logger.getInstance().processInputs("Drivetrain/Gyro", gyroInputs);
+    // // update and log gyro inputs
+    // gyroIO.updateInputs(gyroInputs);
+    // Logger.getInstance().processInputs("Drivetrain/Gyro", gyroInputs);
 
-    // update and log the swerve modules inputs
-    for (SwerveModule swerveModule : swerveModules) {
-      swerveModule.updateAndProcessInputs();
-    }
-    Logger.getInstance().recordOutput("Drivetrain/AvgDriveCurrent", this.getAverageDriveCurrent());
+    // // update and log the swerve modules inputs
+    // for (SwerveModule swerveModule : swerveModules) {
+    //   swerveModule.updateAndProcessInputs();
+    // }
+    // Logger.getInstance().recordOutput("Drivetrain/AvgDriveCurrent",
+    // this.getAverageDriveCurrent());
 
-    // update swerve module states and positions
-    for (int i = 0; i < 4; i++) {
-      prevSwerveModuleStates[i] = swerveModuleStates[i];
-      swerveModuleStates[i] = swerveModules[i].getState();
-      prevSwerveModulePositions[i] = swerveModulePositions[i];
-      swerveModulePositions[i] = swerveModules[i].getPosition();
-    }
+    // // update swerve module states and positions
+    // for (int i = 0; i < 4; i++) {
+    //   prevSwerveModuleStates[i] = swerveModuleStates[i];
+    //   swerveModuleStates[i] = swerveModules[i].getState();
+    //   prevSwerveModulePositions[i] = swerveModulePositions[i];
+    //   swerveModulePositions[i] = swerveModules[i].getPosition();
+    // }
 
-    // if the gyro is not connected, use the swerve module positions to estimate the robot's
-    // rotation
-    if (!gyroInputs.connected || Constants.getMode() == Constants.Mode.SIM) {
-      SwerveModulePosition[] moduleDeltas = new SwerveModulePosition[4];
-      for (int index = 0; index < moduleDeltas.length; index++) {
-        SwerveModulePosition current = swerveModulePositions[index];
-        SwerveModulePosition previous = prevSwerveModulePositions[index];
+    // // if the gyro is not connected, use the swerve module positions to estimate the robot's
+    // // rotation
+    // if (!gyroInputs.connected || Constants.getMode() == Constants.Mode.SIM) {
+    //   SwerveModulePosition[] moduleDeltas = new SwerveModulePosition[4];
+    //   for (int index = 0; index < moduleDeltas.length; index++) {
+    //     SwerveModulePosition current = swerveModulePositions[index];
+    //     SwerveModulePosition previous = prevSwerveModulePositions[index];
 
-        moduleDeltas[index] =
-            new SwerveModulePosition(
-                current.distanceMeters - previous.distanceMeters, current.angle);
-        // FIXME: I don't think this assignment is needed...
-        previous.distanceMeters = current.distanceMeters;
-      }
+    //     moduleDeltas[index] =
+    //         new SwerveModulePosition(
+    //             current.distanceMeters - previous.distanceMeters, current.angle);
+    //     // FIXME: I don't think this assignment is needed...
+    //     previous.distanceMeters = current.distanceMeters;
+    //   }
 
-      Twist2d twist = kinematics.toTwist2d(moduleDeltas);
-      this.gyroIO.addYaw(Math.toDegrees(twist.dtheta));
+    //   Twist2d twist = kinematics.toTwist2d(moduleDeltas);
+    //   this.gyroIO.addYaw(Math.toDegrees(twist.dtheta));
 
-      estimatedPoseWithoutGyro = estimatedPoseWithoutGyro.exp(twist);
-    }
+    //   estimatedPoseWithoutGyro = estimatedPoseWithoutGyro.exp(twist);
+    // }
 
-    // update the pose estimator based on the gyro and swerve module positions
-    poseEstimator.updateWithTime(
-        Logger.getInstance().getRealTimestamp() / 1e6, this.getRotation(), swerveModulePositions);
+    // // update the pose estimator based on the gyro and swerve module positions
+    // poseEstimator.updateWithTime(
+    //     Logger.getInstance().getRealTimestamp() / 1e6, this.getRotation(),
+    // swerveModulePositions);
 
-    // update the brake mode based on the robot's velocity and state (enabled/disabled)
-    updateBrakeMode();
+    // // update the brake mode based on the robot's velocity and state (enabled/disabled)
+    // updateBrakeMode();
 
-    // update tunables
-    if (autoDriveKp.hasChanged() || autoDriveKi.hasChanged() || autoDriveKd.hasChanged()) {
-      autoXController.setPID(autoDriveKp.get(), autoDriveKi.get(), autoDriveKd.get());
-      autoYController.setPID(autoDriveKp.get(), autoDriveKi.get(), autoDriveKd.get());
-    }
-    if (autoTurnKp.hasChanged() || autoTurnKi.hasChanged() || autoTurnKd.hasChanged()) {
-      autoThetaController.setPID(autoTurnKp.get(), autoTurnKi.get(), autoTurnKd.get());
-    }
+    // // update tunables
+    // if (autoDriveKp.hasChanged() || autoDriveKi.hasChanged() || autoDriveKd.hasChanged()) {
+    //   autoXController.setPID(autoDriveKp.get(), autoDriveKi.get(), autoDriveKd.get());
+    //   autoYController.setPID(autoDriveKp.get(), autoDriveKi.get(), autoDriveKd.get());
+    // }
+    // if (autoTurnKp.hasChanged() || autoTurnKi.hasChanged() || autoTurnKd.hasChanged()) {
+    //   autoThetaController.setPID(autoTurnKp.get(), autoTurnKi.get(), autoTurnKd.get());
+    // }
 
-    // log poses, 3D geometry, and swerve module states, gyro offset
-    Pose2d poseEstimatorPose = poseEstimator.getEstimatedPosition();
-    Logger.getInstance().recordOutput("Odometry/RobotNoGyro", estimatedPoseWithoutGyro);
-    Logger.getInstance().recordOutput("Odometry/Robot", poseEstimatorPose);
-    Logger.getInstance().recordOutput("3DField", new Pose3d(poseEstimatorPose));
-    Logger.getInstance().recordOutput("SwerveModuleStates/Measured", swerveModuleStates);
+    // // log poses, 3D geometry, and swerve module states, gyro offset
+    // Pose2d poseEstimatorPose = poseEstimator.getEstimatedPosition();
+    // Logger.getInstance().recordOutput("Odometry/RobotNoGyro", estimatedPoseWithoutGyro);
+    // Logger.getInstance().recordOutput("Odometry/Robot", poseEstimatorPose);
+    // Logger.getInstance().recordOutput("3DField", new Pose3d(poseEstimatorPose));
+    // Logger.getInstance().recordOutput("SwerveModuleStates/Measured", swerveModuleStates);
   }
 
   /**

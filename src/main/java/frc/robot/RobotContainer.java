@@ -15,9 +15,7 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
-import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.SimpleWidget;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -36,7 +34,6 @@ import frc.lib.team3061.vision.VisionIO;
 import frc.lib.team3061.vision.VisionIOPhotonVision;
 import frc.lib.team3061.vision.VisionIOSim;
 import frc.robot.Constants.Mode;
-import frc.robot.commands.ArmToPose;
 import frc.robot.commands.FeedForwardCharacterization;
 import frc.robot.commands.FeedForwardCharacterization.FeedForwardCharacterizationData;
 import frc.robot.commands.FollowPath;
@@ -157,7 +154,7 @@ public class RobotContainer {
             }
             vision = new Vision(visionIOs);
             // subsystem = new Subsystem(new SubsystemIOTalonFX());
-            arm = new ChainDrivenArm(new ChainDrivenArmIOneo() {});
+            arm = new ChainDrivenArm(new ChainDrivenArmIOneo());
 
             if (Constants.getRobot() == Constants.RobotType.ROBOT_DEFAULT) {
               new Pneumatics(new PneumaticsIORev());
@@ -526,7 +523,8 @@ public class RobotContainer {
     // // Shuffleboard.getTab("Arm")
     // //     .add("Move Arm", false)
     // //     .withWidget(BuiltInWidgets.kCommand)
-    // //     .withProperties((Map.of("Start", new ArmToPose(arm, angle)))); // pass angle into command
+    // //     .withProperties((Map.of("Start", new ArmToPose(arm, angle)))); // pass angle into
+    // command
 
     // // SmartDashboard.putData("Arm: start", new ArmToPose(arm, angle));
 

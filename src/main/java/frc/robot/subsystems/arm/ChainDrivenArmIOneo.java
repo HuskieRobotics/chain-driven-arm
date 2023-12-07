@@ -117,9 +117,11 @@ public class ChainDrivenArmIOneo implements ChainDrivenArmIO {
     this.motorTwo.follow(motorOne);
     // Motor Group 2; Drive Counter-clockwise
     this.motorThree = new CANSparkMax(motorThreeID, MotorType.kBrushless);
-    this.motorFour = new CANSparkMax(motorTwoID, MotorType.kBrushless);
+    this.motorFour = new CANSparkMax(motorFourID, MotorType.kBrushless);
     this.motorThree.follow(motorOne, true); // Mirrors the voltage of motorOne
     this.motorFour.follow(motorThree);
+
+    m_pidController = motorOne.getPIDController();
 
     m_pidController.setP(kP.get());
     m_pidController.setI(kI.get());
